@@ -1,0 +1,1274 @@
+<html lang="zh-CN"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>购房返佣计算器</title>
+    <style>body { margin: 0; }</style><style>
+        :root {
+            --primary: #2c80ff;
+            --primary-light: #e6f0ff;
+            --secondary: #ff6b6b;
+            --dark: #333;
+            --light: #f8f9fa;
+            --border: #e0e0e0;
+            --success: #4caf50;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+            padding: 10px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        select, input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+        
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #1a6fe0;
+        }
+        
+        .result-card {
+            display: none;
+        }
+        
+        .result-highlight {
+            background: var(--primary-light);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .result-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+        
+        .result-detail {
+            margin-top: 15px;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .detail-label {
+            font-weight: 600;
+        }
+        
+        .detail-value {
+            font-weight: 500;
+        }
+        
+        .note {
+            background: #fff9e6;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 0 6px 6px 0;
+            font-size: 14px;
+        }
+        
+        .step-indicator {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .step:not(:last-child):after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            right: -50%;
+            width: 100%;
+            height: 2px;
+            background: var(--border);
+            z-index: 1;
+        }
+        
+        .step.active:not(:last-child):after {
+            background: var(--primary);
+        }
+        
+        .step-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            border-radius: 50%;
+            background: var(--border);
+            color: #666;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 2;
+            font-size: 14px;
+        }
+        
+        .step.active .step-number {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .step-text {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .step.active .step-text {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .policy-note {
+            background: #ffeaea;
+            border-left: 4px solid var(--secondary);
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 0 6px 6px 0;
+            font-size: 14px;
+        }
+        
+        .commission-breakdown {
+            margin-top: 10px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .project-info {
+            margin-top: 10px;
+            padding: 12px;
+            background: #f0f7ff;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .info-item {
+            margin-bottom: 5px;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            display: inline-block;
+            width: 70px;
+        }
+        
+        .contact-info {
+            text-align: center;
+            margin-top: 15px;
+            padding: 12px;
+            background: var(--primary-light);
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .share-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f8ff;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .share-section h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .share-section ul {
+            padding-left: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .share-section li {
+            margin-bottom: 5px;
+        }
+        
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .share-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .share-wechat {
+            background: #07c160;
+            color: white;
+        }
+        
+        .share-link {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .share-download {
+            background: #ff6b6b;
+            color: white;
+        }
+        
+        @media (min-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .step-number {
+                width: 40px;
+                height: 40px;
+                line-height: 40px;
+            }
+            
+            .step:not(:last-child):after {
+                top: 20px;
+            }
+        }
+    </style>
+<style data-id="immersive-translate-input-injected-css">.immersive-translate-input {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 2147483647;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.immersive-translate-attach-loading::after {
+  content: " ";
+
+  --loading-color: #f78fb6;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: block;
+  margin: 12px auto;
+  position: relative;
+  color: white;
+  left: -100px;
+  box-sizing: border-box;
+  animation: immersiveTranslateShadowRolling 1.5s linear infinite;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-2000%, -50%);
+  z-index: 100;
+}
+
+.immersive-translate-loading-spinner {
+  vertical-align: middle !important;
+  width: 10px !important;
+  height: 10px !important;
+  display: inline-block !important;
+  margin: 0 4px !important;
+  border: 2px rgba(221, 244, 255, 0.6) solid !important;
+  border-top: 2px rgba(0, 0, 0, 0.375) solid !important;
+  border-left: 2px rgba(0, 0, 0, 0.375) solid !important;
+  border-radius: 50% !important;
+  padding: 0 !important;
+  -webkit-animation: immersive-translate-loading-animation 0.6s infinite linear !important;
+  animation: immersive-translate-loading-animation 0.6s infinite linear !important;
+}
+
+@-webkit-keyframes immersive-translate-loading-animation {
+  from {
+    -webkit-transform: rotate(0deg);
+  }
+
+  to {
+    -webkit-transform: rotate(359deg);
+  }
+}
+
+@keyframes immersive-translate-loading-animation {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(359deg);
+  }
+}
+
+.immersive-translate-input-loading {
+  --loading-color: #f78fb6;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: block;
+  margin: 12px auto;
+  position: relative;
+  color: white;
+  left: -100px;
+  box-sizing: border-box;
+  animation: immersiveTranslateShadowRolling 1.5s linear infinite;
+}
+
+@keyframes immersiveTranslateShadowRolling {
+  0% {
+    box-shadow: 0px 0 rgba(255, 255, 255, 0), 0px 0 rgba(255, 255, 255, 0),
+      0px 0 rgba(255, 255, 255, 0), 0px 0 rgba(255, 255, 255, 0);
+  }
+
+  12% {
+    box-shadow: 100px 0 var(--loading-color), 0px 0 rgba(255, 255, 255, 0),
+      0px 0 rgba(255, 255, 255, 0), 0px 0 rgba(255, 255, 255, 0);
+  }
+
+  25% {
+    box-shadow: 110px 0 var(--loading-color), 100px 0 var(--loading-color),
+      0px 0 rgba(255, 255, 255, 0), 0px 0 rgba(255, 255, 255, 0);
+  }
+
+  36% {
+    box-shadow: 120px 0 var(--loading-color), 110px 0 var(--loading-color),
+      100px 0 var(--loading-color), 0px 0 rgba(255, 255, 255, 0);
+  }
+
+  50% {
+    box-shadow: 130px 0 var(--loading-color), 120px 0 var(--loading-color),
+      110px 0 var(--loading-color), 100px 0 var(--loading-color);
+  }
+
+  62% {
+    box-shadow: 200px 0 rgba(255, 255, 255, 0), 130px 0 var(--loading-color),
+      120px 0 var(--loading-color), 110px 0 var(--loading-color);
+  }
+
+  75% {
+    box-shadow: 200px 0 rgba(255, 255, 255, 0), 200px 0 rgba(255, 255, 255, 0),
+      130px 0 var(--loading-color), 120px 0 var(--loading-color);
+  }
+
+  87% {
+    box-shadow: 200px 0 rgba(255, 255, 255, 0), 200px 0 rgba(255, 255, 255, 0),
+      200px 0 rgba(255, 255, 255, 0), 130px 0 var(--loading-color);
+  }
+
+  100% {
+    box-shadow: 200px 0 rgba(255, 255, 255, 0), 200px 0 rgba(255, 255, 255, 0),
+      200px 0 rgba(255, 255, 255, 0), 200px 0 rgba(255, 255, 255, 0);
+  }
+}
+
+.immersive-translate-toast {
+  display: flex;
+  position: fixed;
+  z-index: 2147483647;
+  left: 0;
+  right: 0;
+  top: 1%;
+  width: fit-content;
+  padding: 12px 20px;
+  margin: auto;
+  overflow: auto;
+  background: #fef6f9;
+  box-shadow: 0px 4px 10px 0px rgba(0, 10, 30, 0.06);
+  font-size: 15px;
+  border-radius: 8px;
+  color: #333;
+}
+
+.immersive-translate-toast-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.immersive-translate-toast-hidden {
+  margin: 0 20px 0 72px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.immersive-translate-toast-close {
+  color: #666666;
+  font-size: 20px;
+  font-weight: bold;
+  padding: 0 10px;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+  .immersive-translate-toast {
+    top: 0;
+    padding: 12px 0px 0 10px;
+  }
+  .immersive-translate-toast-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  .immersive-translate-toast-hidden {
+    margin: 10px auto;
+  }
+}
+
+.immersive-translate-dialog {
+  position: fixed;
+  z-index: 2147483647;
+  left: 0;
+  top: 0;
+  display: flex;
+  width: 300px;
+  flex-direction: column;
+  align-items: center;
+  font-size: 15px;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  height: fit-content;
+  border-radius: 20px;
+  background-color: #fff;
+}
+
+.immersive-translate-modal {
+  display: none;
+  position: fixed;
+  z-index: 2147483647;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.4);
+  font-size: 15px;
+}
+
+.immersive-translate-modal-content {
+  background-color: #fefefe;
+  margin: 10% auto;
+  padding: 40px 24px 24px;
+  border-radius: 12px;
+  width: 350px;
+  font-family: system-ui, -apple-system, "Segoe UI", "Roboto", "Ubuntu",
+    "Cantarell", "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
+  position: relative;
+}
+
+@media screen and (max-width: 768px) {
+  .immersive-translate-modal-content {
+    margin: 25% auto !important;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .immersive-translate-modal-content {
+    width: 80vw !important;
+    margin: 20vh auto !important;
+    padding: 20px 12px 12px !important;
+  }
+
+  .immersive-translate-modal-title {
+    font-size: 14px !important;
+  }
+
+  .immersive-translate-modal-body {
+    font-size: 13px !important;
+    max-height: 60vh !important;
+  }
+
+  .immersive-translate-btn {
+    font-size: 13px !important;
+    padding: 8px 16px !important;
+    margin: 0 4px !important;
+  }
+
+  .immersive-translate-modal-footer {
+    gap: 6px !important;
+    margin-top: 16px !important;
+  }
+}
+
+.immersive-translate-modal .immersive-translate-modal-content-in-input {
+  max-width: 500px;
+}
+.immersive-translate-modal-content-in-input .immersive-translate-modal-body {
+  text-align: left;
+  max-height: unset;
+}
+
+.immersive-translate-modal-title {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 700;
+  color: #333333;
+}
+
+.immersive-translate-modal-body {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 400;
+  color: #333333;
+  margin-top: 24px;
+  word-break: break-all;
+}
+
+@media screen and (max-width: 768px) {
+  .immersive-translate-modal-body {
+    max-height: 250px;
+    overflow-y: auto;
+  }
+}
+
+.immersive-translate-close {
+  color: #666666;
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.immersive-translate-close:hover,
+.immersive-translate-close:focus {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.immersive-translate-modal-footer {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+
+.immersive-translate-btn {
+  width: fit-content;
+  color: #fff;
+  background-color: #ea4c89;
+  border: none;
+  font-size: 14px;
+  margin: 0 8px;
+  padding: 9px 30px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.immersive-translate-btn-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.immersive-translate-btn:hover {
+  background-color: #f082ac;
+}
+.immersive-translate-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.immersive-translate-btn:disabled:hover {
+  background-color: #ea4c89;
+}
+
+.immersive-translate-link-btn {
+  background-color: transparent;
+  color: #ea4c89;
+  border: none;
+  cursor: pointer;
+  height: 30px;
+  line-height: 30px;
+}
+
+.immersive-translate-cancel-btn {
+  /* gray color */
+  background-color: rgb(89, 107, 120);
+}
+
+.immersive-translate-cancel-btn:hover {
+  background-color: hsl(205, 20%, 32%);
+}
+
+.immersive-translate-action-btn {
+  background-color: transparent;
+  color: #ea4c89;
+  border: 1px solid #ea4c89;
+}
+
+.immersive-translate-btn svg {
+  margin-right: 5px;
+}
+
+.immersive-translate-link {
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-drag: none;
+  text-decoration: none;
+  color: #ea4c89;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+}
+
+.immersive-translate-primary-link {
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-drag: none;
+  text-decoration: none;
+  color: #ea4c89;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+}
+
+.immersive-translate-modal input[type="radio"] {
+  margin: 0 6px;
+  cursor: pointer;
+}
+
+.immersive-translate-modal label {
+  cursor: pointer;
+}
+
+.immersive-translate-close-action {
+  position: absolute;
+  top: 2px;
+  right: 0px;
+  cursor: pointer;
+}
+
+.imt-image-status {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 16px !important;
+}
+.imt-image-status img,
+.imt-image-status svg,
+.imt-img-loading {
+  width: 28px !important;
+  height: 28px !important;
+  margin: 0 0 8px 0 !important;
+  min-height: 28px !important;
+  min-width: 28px !important;
+  position: relative !important;
+}
+.imt-img-loading {
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAMAAACfWMssAAAAtFBMVEUAAAD////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////oK74hAAAAPHRSTlMABBMIDyQXHwyBfFdDMSw+OjXCb+5RG51IvV/k0rOqlGRM6KKMhdvNyZBz9MaupmxpWyj437iYd/yJVNZeuUC7AAACt0lEQVRIx53T2XKiUBCA4QYOiyCbiAsuuGBcYtxiYtT3f6/pbqoYHVFO5r+iivpo6DpAWYpqeoFfr9f90DsYAuRSWkFnPO50OgR9PwiCUFcl2GEcx+N/YBh6pvKaefHlUgZd1zVe0NbYcQjGBfzrPE8Xz8aF+71D8gG6DHFPpc4a7xFiCDuhaWgKgGIJQ3d5IMGDrpS4S5KgpIm+en9f6PlAhKby4JwEIxlYJV9h5k5nee9GoxHJ2IDSNB0dwdad1NAxDJ/uXDHYmebdk4PdbkS58CIVHdYSUHTYYRWOJblWSyu2lmy3KNFVJNBhxcuGW4YBVCbYGRZwIooipHsNqjM4FbgOQqQqSKQQU9V8xmi1QlgHqQQ6DDBvRUVCDirs+EzGDGOQTCATgtYTnbCVLgsVgRE0T1QE0qHCFAht2z6dLvJQs3Lo2FQoDxWNUiBhaP4eRgwNkI+dAjVOA/kUrIDwf3CG8NfNOE0eiFotSuo+rBiq8tD9oY4Qzc6YJw99hl1wzpQvD7ef2M8QgnOGJfJw+EltQc+oX2yn907QB22WZcvlUpd143dqQu+8pCJZuGE4xCuPXJqqcs5sNpsI93Rmzym1k4Npk+oD1SH3/a3LOK/JpUBpWfqNySxWzCfNCUITuDG5dtuphrUJ1myeIE9bIsPiKrfqTai5WZxbhtNphYx6GEIHihyGFTI69lje/rxajdh0s0msZ0zYxyPLhYCb1CyHm9Qsd2H37Y3lugVwL9kNh8Ot8cha6fUNQ8nuXi5z9/ExsAO4zQrb/ev1yrCB7lGyQzgYDGuxq1toDN/JGvN+HyWNHKB7zEoK+PX11e12G431erGYzwmytAWU56fkMHY5JJnDRR2eZji3AwtIcrEV8Cojat/BdQ7XOwGV1e1hDjGGjXbdArm8uJZtCH5MbcctVX8A1WpqumJHwckAAAAASUVORK5CYII=");
+  background-size: 28px 28px;
+  animation: image-loading-rotate 1s linear infinite !important;
+}
+
+.imt-image-status span {
+  color: var(--bg-2, #fff) !important;
+  font-size: 14px !important;
+  line-height: 14px !important;
+  font-weight: 500 !important;
+  font-family: "PingFang SC", Arial, sans-serif !important;
+}
+
+.imt-primary-button {
+  display: flex;
+  padding: 12px 80px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+  background: #ea4c89;
+  color: #fff;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 24px;
+  border: none;
+  cursor: pointer;
+}
+
+.imt-retry-text {
+  color: #999;
+  text-align: center;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 21px;
+  cursor: pointer;
+}
+
+.imt-action-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.imt-modal-content-text {
+  text-align: left;
+  color: #333;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+}
+
+@keyframes image-loading-rotate {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+.imt-linear-gradient-text {
+  background: linear-gradient(90deg, #00a6ff 0%, #c369ff 52.4%, #ff4590 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.imt-flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.imt-linear-black-btn {
+  border-radius: 50px;
+  background: linear-gradient(66deg, #222 19%, #696969 94.25%);
+  height: 48px;
+  width: 100%;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  justify-content: center;
+}
+</style></head>
+<body>
+    <div class="container">
+        <header>
+            <h1>购房返佣计算器</h1>
+            <p>基于最新楼盘数据，智能计算购房佣金与优惠</p>
+        </header>
+        
+        <div class="step-indicator">
+            <div class="step active">
+                <div class="step-number">1</div>
+                <div class="step-text">选择楼盘</div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-text">输入总价</div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-text">查看结果</div>
+            </div>
+        </div>
+        
+        <div class="card" id="input-card">
+            <div class="form-group">
+                <label for="project">选择楼盘</label>
+                <select id="project"><option value="">请选择楼盘</option><option value="1">大家璞悦光年</option><option value="2">大家·金麟府</option><option value="3">伟星天空之城</option><option value="4">宜居梦溪观澜</option><option value="5">伟星镜湖壹品</option></select>
+            </div>
+            
+            <div class="form-group">
+                <label for="price">房屋总价（万元）</label>
+                <input type="number" id="price" placeholder="请输入房屋总价">
+            </div>
+            
+            <button class="btn" id="calculate-btn">计算返佣</button>
+            
+            <div class="contact-info">
+                项目联系人：张健<br>
+                联系电话：18356592875
+            </div>
+        </div>
+        
+        <div class="card result-card" id="result-card">
+            <div class="result-highlight">
+                <div>预估优惠金额</div>
+                <div class="result-value" id="discount-amount">0.00 万元</div>
+                <div>占房屋总价的 <span id="discount-percent">0.00</span>%</div>
+            </div>
+            
+            <div class="result-detail">
+                <div class="detail-item">
+                    <div class="detail-label">开发商佣金</div>
+                    <div class="detail-value" id="commission">0.00 万元</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">返佣政策</div>
+                    <div class="detail-value" id="rebate-policy">阶梯返佣</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">购房者优惠</div>
+                    <div class="detail-value" id="discount">0.00 万元</div>
+                </div>
+            </div>
+            
+            <div class="commission-breakdown" id="commission-breakdown"></div>
+            
+            <div class="project-info" id="project-info"></div>
+            
+            <div class="policy-note" id="policy-note"></div>
+            
+            <div class="contact-info">
+                项目联系人：张健<br>
+                联系电话：18356592875
+            </div>
+            
+            <div class="note">
+                <p><strong>温馨提示：</strong>本计算结果为估算值，实际返佣金额以最终购房合同为准。</p>
+            </div>
+            
+            <button class="btn" id="reset-btn" style="margin-top: 15px;">重新计算</button>
+        </div>
+        
+        <div class="share-section">
+            <h3>分享计算器给客户</h3>
+            <p>您可以通过以下方式将此计算器分享给客户：</p>
+            <ul>
+                <li><strong>微信分享：</strong>将链接发送给客户或分享到朋友圈</li>
+                <li><strong>链接分享：</strong>复制链接通过短信、邮件等方式发送</li>
+                <li><strong>文件分享：</strong>下载HTML文件直接发送给客户</li>
+            </ul>
+            
+            <div class="share-buttons">
+                <button class="share-btn share-wechat" id="share-wechat">
+                    <span>微信分享</span>
+                </button>
+                <button class="share-btn share-link" id="share-link">
+                    <span>复制链接</span>
+                </button>
+                <button class="share-btn share-download" id="share-download">
+                    <span>下载文件</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 简化版楼盘数据
+        const projectPolicies = {
+            "1": { 
+                name: "大家璞悦光年", 
+                contact: "张健 18356592875",
+                commission: "阶梯固定金额",
+                steps: [
+                    { threshold: 25, amount: 4.1 },
+                    { threshold: 50, amount: 4.9 },
+                    { threshold: Infinity, amount: 5.7 }
+                ],
+                type: "住宅",
+                buildings: "B地块：3# 13# 25#7#8#15# A地块：9#13#15#21#17#26#",
+                area: "89-119㎡",
+                price: "高层均价：10500元/平 洋房均价:11500元/平",
+                protection: "报备24小时内有效，到访保护期30天",
+                delivery: "现房"
+            },
+            "2": { 
+                name: "大家·金麟府", 
+                contact: "张健 18356592875",
+                commission: "固定金额",
+                fixedAmount: 6.5,
+                type: "住宅",
+                buildings: "6#7#9#10#12#16#17#18# 新加推13#",
+                area: "高层99-112㎡ 洋房112-123㎡",
+                price: "高层均价7500-8500元/平 洋房均价9500-9800元/平",
+                protection: "报备24小时内有效，到访保护期30天",
+                delivery: "现房"
+            },
+            "3": { 
+                name: "伟星天空之城", 
+                contact: "张健 18356592875",
+                commission: "固定金额",
+                fixedAmount: 4.0,
+                type: "住宅",
+                buildings: "精装：高层62#65# 洋房：53-55-56-57-58-59-60-61-63#-35#",
+                area: "高层101-112m² 洋房：100-127m²",
+                price: "精装高层均价10500元/平起 精装洋房均价12000元/平起",
+                protection: "报备有效保护期72小时，到访保护期60天",
+                delivery: "1号地块：现房"
+            },
+            "4": { 
+                name: "宜居梦溪观澜", 
+                contact: "张健 18356592875",
+                commission: "比例+固定金额",
+                rate: 0.024,
+                fixedAmount: 1.6,
+                extra: "8000购物卡",
+                type: "住宅",
+                buildings: "高层：3#6#8# 洋房：11#15#9#",
+                area: "高层111-127m² 洋房：135-148m²",
+                price: "高层均价7800元/平起 洋房均价10000元/平起",
+                protection: "报备当天有效，到访保护期30天",
+                delivery: "2026年5月"
+            },
+            "5": { 
+                name: "伟星镜湖壹品", 
+                contact: "张健 18356592875",
+                commission: "固定金额",
+                fixedAmount: 4.0,
+                type: "住宅",
+                buildings: "3#18层，125㎡ 8#21层，105/123/136㎡ 11#26层，106/123㎡ 10#26层，104/122/135㎡ 7#20层，105-122-135 2# 18层 102-119",
+                area: "8，11、10、7、号楼高层106,123,136m² 3、6号楼洋房125m²",
+                price: "均价15000-17500元/平",
+                protection: "报备有效保护期72小时，到访保护期60天",
+                delivery: "首批已交付 3#：2026年9月 7#：2026年11月 2#:2027年4月"
+            }
+        };
+        
+        // 返佣政策
+        const REBATE_THRESHOLD = 2.5;
+        const REBATE_RATE_BELOW = 0.5;
+        const REBATE_RATE_ABOVE = 0.6;
+        
+        // DOM元素
+        const projectSelect = document.getElementById('project');
+        const priceInput = document.getElementById('price');
+        const calculateBtn = document.getElementById('calculate-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const inputCard = document.getElementById('input-card');
+        const resultCard = document.getElementById('result-card');
+        const discountAmount = document.getElementById('discount-amount');
+        const discountPercent = document.getElementById('discount-percent');
+        const commission = document.getElementById('commission');
+        const rebatePolicy = document.getElementById('rebate-policy');
+        const discount = document.getElementById('discount');
+        const policyNote = document.getElementById('policy-note');
+        const commissionBreakdown = document.getElementById('commission-breakdown');
+        const projectInfo = document.getElementById('project-info');
+        const steps = document.querySelectorAll('.step');
+        const shareWechatBtn = document.getElementById('share-wechat');
+        const shareLinkBtn = document.getElementById('share-link');
+        const shareDownloadBtn = document.getElementById('share-download');
+        
+        // 初始化楼盘下拉菜单
+        function initializeProjectSelect() {
+            projectSelect.innerHTML = '<option value="">请选择楼盘</option>';
+            
+            for (const id in projectPolicies) {
+                const project = projectPolicies[id];
+                const option = document.createElement('option');
+                option.value = id;
+                option.textContent = project.name;
+                projectSelect.appendChild(option);
+            }
+        }
+        
+        // 计算佣金
+        function calculateCommission(projectId, price) {
+            const policy = projectPolicies[projectId];
+            if (!policy) return 0;
+            
+            let totalCommission = 0;
+            let commissionDescription = '';
+            
+            if (policy.commission === "暂停报备" || policy.commission === "佣金待定") {
+                commissionDescription = `<strong>注意：</strong>该项目${policy.commission}`;
+                policyNote.innerHTML = commissionDescription;
+                return 0;
+            }
+            
+            // 固定金额佣金
+            if (policy.fixedAmount !== undefined && policy.rate === undefined) {
+                totalCommission = policy.fixedAmount;
+                commissionDescription = `<strong>固定佣金：</strong>${policy.fixedAmount}万元/套`;
+            }
+            // 固定比例佣金
+            else if (policy.rate !== undefined && policy.fixedAmount === undefined) {
+                totalCommission = price * policy.rate;
+                commissionDescription = `<strong>固定比例佣金：</strong>${(policy.rate * 100).toFixed(1)}% = ${totalCommission.toFixed(2)}万元`;
+            }
+            // 混合模式（比例+固定金额）
+            else if (policy.rate !== undefined && policy.fixedAmount !== undefined) {
+                totalCommission = (price * policy.rate) + policy.fixedAmount;
+                commissionDescription = `<strong>混合佣金：</strong>${(policy.rate * 100).toFixed(1)}% + ${policy.fixedAmount}万元 = ${totalCommission.toFixed(2)}万元`;
+                if (policy.extra) {
+                    commissionDescription += `<br><strong>额外奖励：</strong>${policy.extra}`;
+                }
+            }
+            // 阶梯固定金额
+            else if (policy.steps !== undefined && policy.steps[0].amount !== undefined) {
+                totalCommission = policy.steps[0].amount;
+                commissionDescription = `<strong>阶梯固定佣金：</strong>${policy.steps[0].amount}万元/套（第一阶梯）`;
+            }
+            
+            policyNote.innerHTML = commissionDescription;
+            return totalCommission;
+        }
+        
+        // 计算返佣金额
+        function calculateRebate(totalCommission) {
+            if (totalCommission <= REBATE_THRESHOLD) {
+                return totalCommission * REBATE_RATE_BELOW;
+            } else {
+                return (REBATE_THRESHOLD * REBATE_RATE_BELOW) + 
+                       ((totalCommission - REBATE_THRESHOLD) * REBATE_RATE_ABOVE);
+            }
+        }
+        
+        // 生成返佣分解说明
+        function generateRebateBreakdown(totalCommission, rebateAmount) {
+            let breakdownHTML = '<strong>返佣分解：</strong><br>';
+            
+            if (totalCommission <= REBATE_THRESHOLD) {
+                breakdownHTML += `
+                    <div class="breakdown-item">
+                        <span>全部佣金 ${totalCommission.toFixed(2)} 万元 × ${(REBATE_RATE_BELOW * 100)}%</span>
+                        <span>${rebateAmount.toFixed(2)} 万元</span>
+                    </div>
+                `;
+            } else {
+                breakdownHTML += `
+                    <div class="breakdown-item">
+                        <span>2.5万元内部分 × ${(REBATE_RATE_BELOW * 100)}%</span>
+                        <span>${(REBATE_THRESHOLD * REBATE_RATE_BELOW).toFixed(2)} 万元</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>超出部分 ${(totalCommission - REBATE_THRESHOLD).toFixed(2)} 万元 × ${(REBATE_RATE_ABOVE * 100)}%</span>
+                        <span>${((totalCommission - REBATE_THRESHOLD) * REBATE_RATE_ABOVE).toFixed(2)} 万元</span>
+                    </div>
+                `;
+            }
+            
+            return breakdownHTML;
+        }
+        
+        // 生成楼盘信息
+        function generateProjectInfo(projectId) {
+            const project = projectPolicies[projectId];
+            if (!project) return '';
+            
+            let infoHTML = '<strong>楼盘信息：</strong><br>';
+            infoHTML += `<div class="info-item"><span class="info-label">联系人:</span> ${project.contact}</div>`;
+            infoHTML += `<div class="info-item"><span class="info-label">产品类型:</span> ${project.type}</div>`;
+            infoHTML += `<div class="info-item"><span class="info-label">在售楼栋:</span> ${project.buildings}</div>`;
+            infoHTML += `<div class="info-item"><span class="info-label">面积:</span> ${project.area}</div>`;
+            infoHTML += `<div class="info-item"><span class="info-label">价格:</span> ${project.price}</div>`;
+            infoHTML += `<div class="info-item"><span class="info-label">保护期:</span> ${project.protection}</div>`;
+            infoHTML += `<div class="info-item"><span class="info-label">交付时间:</span> ${project.delivery}</div>`;
+            
+            return infoHTML;
+        }
+        
+        // 分享功能
+        function setupShareFunctions() {
+            // 微信分享提示
+            shareWechatBtn.addEventListener('click', function() {
+                alert('请将当前页面链接分享到微信：\n\n1. 点击浏览器菜单中的"分享"按钮\n2. 选择"微信"或"发送给朋友"\n3. 或将链接复制后直接在微信中发送');
+            });
+            
+            // 复制链接
+            shareLinkBtn.addEventListener('click', function() {
+                const currentUrl = window.location.href;
+                navigator.clipboard.writeText(currentUrl).then(function() {
+                    alert('链接已复制到剪贴板！\n\n您可以将此链接通过短信、邮件或其他方式发送给客户。');
+                }, function() {
+                    // 如果clipboard API不支持，使用备用方法
+                    const textArea = document.createElement('textarea');
+                    textArea.value = currentUrl;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    alert('链接已复制到剪贴板！\n\n您可以将此链接通过短信、邮件或其他方式发送给客户。');
+                });
+            });
+            
+            // 下载HTML文件
+            shareDownloadBtn.addEventListener('click', function() {
+                const htmlContent = document.documentElement.outerHTML;
+                const blob = new Blob([htmlContent], {type: 'text/html'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = '购房返佣计算器.html';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                alert('文件已下载！\n\n您可以将此文件直接发送给客户，客户双击即可打开使用。');
+            });
+        }
+        
+        // 计算按钮点击事件
+        calculateBtn.addEventListener('click', function() {
+            const projectId = projectSelect.value;
+            const price = parseFloat(priceInput.value);
+            
+            if (!projectId) {
+                alert('请选择楼盘');
+                return;
+            }
+            
+            if (!price || price <= 0) {
+                alert('请输入有效的房屋总价');
+                return;
+            }
+            
+            // 计算开发商佣金
+            const totalCommission = calculateCommission(projectId, price);
+            
+            // 计算购房者优惠（返佣）
+            const discountValue = calculateRebate(totalCommission);
+            
+            // 更新UI显示结果
+            commission.textContent = totalCommission.toFixed(2) + ' 万元';
+            rebatePolicy.textContent = '阶梯返佣 (2.5万内50%，超出部分60%)';
+            discount.textContent = discountValue.toFixed(2) + ' 万元';
+            discountAmount.textContent = discountValue.toFixed(2) + ' 万元';
+            discountPercent.textContent = ((discountValue / price) * 100).toFixed(2);
+            
+            // 显示返佣分解
+            commissionBreakdown.innerHTML = generateRebateBreakdown(totalCommission, discountValue);
+            
+            // 显示楼盘信息
+            projectInfo.innerHTML = generateProjectInfo(projectId);
+            
+            // 显示结果卡片
+            inputCard.style.display = 'none';
+            resultCard.style.display = 'block';
+            
+            // 更新步骤指示器
+            steps[0].classList.remove('active');
+            steps[1].classList.remove('active');
+            steps[2].classList.add('active');
+        });
+        
+        // 重置按钮点击事件
+        resetBtn.addEventListener('click', function() {
+            // 重置表单
+            projectSelect.value = '';
+            priceInput.value = '';
+            
+            // 显示输入卡片
+            inputCard.style.display = 'block';
+            resultCard.style.display = 'none';
+            
+            // 重置步骤指示器
+            steps[0].classList.add('active');
+            steps[1].classList.remove('active');
+            steps[2].classList.remove('active');
+        });
+        
+        // 楼盘选择变化时更新步骤指示器
+        projectSelect.addEventListener('change', function() {
+            if (projectSelect.value) {
+                steps[0].classList.remove('active');
+                steps[1].classList.add('active');
+            } else {
+                steps[0].classList.add('active');
+                steps[1].classList.remove('active');
+            }
+        });
+        
+        // 初始化
+        initializeProjectSelect();
+        setupShareFunctions();
+    </script>
+
+</body></html>
